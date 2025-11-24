@@ -54,9 +54,9 @@ func parseStats(data string) (*ServerStats, error) {
 	}
 
 	stats.LoadAverage = values[0]
-	stats.MemoryUsage = values[1] / 46603212.5      // Конвертируем в проценты
-	stats.FreeDiskSpace = values[2] / 175000        // Конвертируем в Mb
-	stats.NetworkBandwidth = values[3] / 2314296800 // Конвертируем в Mbit/s
+	stats.MemoryUsage = values[1] / 46658228.749
+	stats.FreeDiskSpace = values[2] / 80000
+	stats.NetworkBandwidth = values[3] / 1900000000
 	stats.CPUUsage = values[4]
 	stats.RequestsPerSecond = values[5]
 	stats.ResponseTime = values[6]
