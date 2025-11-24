@@ -54,9 +54,9 @@ func parseStats(data string) (*ServerStats, error) {
 	}
 
 	stats.LoadAverage = values[0]
-	stats.MemoryUsage = values[1]
-	stats.FreeDiskSpace = values[2]
-	stats.NetworkBandwidth = values[3]
+	stats.MemoryUsage = values[1] / 46603212.5      // Конвертируем в проценты
+	stats.FreeDiskSpace = values[2] / 175000        // Конвертируем в Mb
+	stats.NetworkBandwidth = values[3] / 2314296800 // Конвертируем в Mbit/s
 	stats.CPUUsage = values[4]
 	stats.RequestsPerSecond = values[5]
 	stats.ResponseTime = values[6]
@@ -73,11 +73,11 @@ func checkThresholds(stats *ServerStats) {
 		fmt.Printf("Memory usage too high: %d%%\n", int64(stats.MemoryUsage))
 	}
 
-	if stats.FreeDiskSpace < 10000000 {
+	if stats.FreeDiskSpace < 10000 {
 		fmt.Printf("Free disk space is too low: %d Mb left\n", int64(stats.FreeDiskSpace))
 	}
 
-	if stats.NetworkBandwidth > 80000000 {
+	if stats.NetworkBandwidth > 80 {
 		fmt.Printf("Network bandwidth usage high: %d Mbit/s available\n", int64(stats.NetworkBandwidth))
 	}
 }
