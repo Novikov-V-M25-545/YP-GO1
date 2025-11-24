@@ -66,19 +66,19 @@ func parseStats(data string) (*ServerStats, error) {
 
 func checkThresholds(stats *ServerStats) {
 	if stats.LoadAverage > 30 {
-		fmt.Printf("Load Average is too high: %.2f\n", stats.LoadAverage)
+		fmt.Printf("Load Average is too high: %d\n", int64(stats.LoadAverage))
 	}
 
 	if stats.MemoryUsage > 80 {
-		fmt.Printf("Memory usage too high: %.0f%%\n", stats.MemoryUsage)
+		fmt.Printf("Memory usage too high: %d%%\n", int64(stats.MemoryUsage))
 	}
 
-	if stats.FreeDiskSpace < 10 {
-		fmt.Printf("Free disk space is too low: %.0f Mb left\n", stats.FreeDiskSpace)
+	if stats.FreeDiskSpace < 10000000 {
+		fmt.Printf("Free disk space is too low: %d Mb left\n", int64(stats.FreeDiskSpace))
 	}
 
-	if stats.NetworkBandwidth > 90 {
-		fmt.Printf("Network bandwidth usage high: %.0f Mbit/s available\n", stats.NetworkBandwidth)
+	if stats.NetworkBandwidth > 80000000 {
+		fmt.Printf("Network bandwidth usage high: %d Mbit/s available\n", int64(stats.NetworkBandwidth))
 	}
 }
 
