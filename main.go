@@ -60,27 +60,23 @@ func parseStats(data string) (*ServerStats, error) {
 	stats.LoadAverage = values[0]
 
 	// values[1] = всего памяти, values[2] = использованной памяти
-	// Memory% = (used / total) * 100
 	if values[1] > 0 {
 		stats.MemoryUsage = (values[2] / values[1]) * 100
 	}
 
 	// values[3] = всего диска, values[4] = использованного диска
-	// Free Disk = (total - used) / 1024 / 1024 (в Mb)
 	freeDiskBytes := values[3] - values[4]
 	stats.FreeDiskSpace = freeDiskBytes / 1024 / 1024
 
 	// values[5] = пропускная способность, values[6] = загруженность
-	// NetworkBandwidth Usage% = (used / total) * 100
-	// Если > 90%, выводить свободную полосу в Mbit/s
 	if values[5] > 0 {
 		bandwidthUsagePercent := (values[6] / values[5]) * 100
 
-		// Если использование > 90%, то выводим оставшуюся свободную полосу
 		if bandwidthUsagePercent > 90 {
 			freeBandwidthBytes := values[5] - values[6]
-			// Конвертируем из байтов/сек в Мегабиты/сек: / 1000000 / 8
-			stats.NetworkBandwidth = freeBandwidthBytes / 1_000_000 / 8
+			// Конвертация: байты/сек → Мегабиты/сек
+			// 1 Мегабит = 1,000,000 бит = 125,000 байт
+			stats.NetworkBandwidth = freeBandwidthBytes / 125000
 		}
 	}
 
@@ -104,7 +100,7 @@ func checkThresholds(stats *ServerStats) {
 		fmt.Printf("Free disk space is too low: %d Mb left\n", int(stats.FreeDiskSpace))
 	}
 
-	if stats.NetworkBandwidth > 0 && stats.NetworkBandwidth < 1000 {
+	if stats.NetworkBandwidth > 0 {
 		fmt.Printf("Network bandwidth usage high: %d Mbit/s available\n", int(stats.NetworkBandwidth))
 	}
 }
