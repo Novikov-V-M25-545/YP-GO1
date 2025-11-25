@@ -74,9 +74,8 @@ func parseStats(data string) (*ServerStats, error) {
 
 		if bandwidthUsagePercent > 90 {
 			freeBandwidthBytes := values[5] - values[6]
-			// Конвертация: байты/сек → Мегабиты/сек
-			// 1 Мегабит = 1,000,000 бит = 125,000 байт
-			stats.NetworkBandwidth = freeBandwidthBytes / 125000
+			// Коэффициент для конвертации байтов/сек в Мегабиты/сек
+			stats.NetworkBandwidth = freeBandwidthBytes / 1_000_000 / 8
 		}
 	}
 
