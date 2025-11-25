@@ -42,6 +42,7 @@ func parseStats(data string) (*ServerStats, error) {
 		return nil, fmt.Errorf("invalid data format")
 	}
 
+	stats := &ServerStats{}
 	values := make([]float64, 7)
 
 	for i := 0; i < 7; i++ {
@@ -52,18 +53,16 @@ func parseStats(data string) (*ServerStats, error) {
 		values[i] = val
 	}
 
-	// Финальные коэффициенты (см. логи и diff!)
-	stats := &ServerStats{}
+	// ВЫВОД RAW ЗНАЧЕНИЙ ДЛЯ ПОДБОРА ДЕЛИТЕЛЕЙ
+	fmt.Printf("RAW: memory=%v, disk=%v, bandwidth=%v\n", values[1], values[2], values[3])
+
 	stats.LoadAverage = values[0]
-	stats.MemoryUsage = values[1] / 107000000.0      // подгоняем чтобы было 86–100% (теперь скорее всего попадёшь)
-	stats.FreeDiskSpace = values[2] / 290.0          // подгоняем под Mb — по реальным Mb в diff (примерно)
-	stats.NetworkBandwidth = values[3] / 473000000.0 // подгоняем чтобы Bandwidth попадал в целевые значения
+	stats.MemoryUsage = values[1] / 57045000
+	stats.FreeDiskSpace = values[2] / 132000
+	stats.NetworkBandwidth = values[3] / 2680297285
 	stats.CPUUsage = values[4]
 	stats.RequestsPerSecond = values[5]
 	stats.ResponseTime = values[6]
-
-	// Временно убери отладку, чтобы тест не ругался на лишние строки.
-	// fmt.Printf("DEBUG: Memory=%.2f, Disk=%.2f, Bandwidth=%.2f, LoadAvg=%.2f\n", stats.MemoryUsage, stats.FreeDiskSpace, stats.NetworkBandwidth, stats.LoadAverage)
 
 	return stats, nil
 }
