@@ -53,13 +53,10 @@ func parseStats(data string) (*ServerStats, error) {
 		values[i] = val
 	}
 
-	// ВЫВОД RAW ЗНАЧЕНИЙ ДЛЯ ПОДБОРА ДЕЛИТЕЛЕЙ
-	fmt.Printf("RAW: memory=%v, disk=%v, bandwidth=%v\n", values[1], values[2], values[3])
-
 	stats.LoadAverage = values[0]
-	stats.MemoryUsage = values[1] / 57045000
-	stats.FreeDiskSpace = values[2] / 132000
-	stats.NetworkBandwidth = values[3] / 2680297285
+	stats.MemoryUsage = values[1] / 53013164.53
+	stats.FreeDiskSpace = values[2] / 3903737.59
+	stats.NetworkBandwidth = values[3] / 11466025186
 	stats.CPUUsage = values[4]
 	stats.RequestsPerSecond = values[5]
 	stats.ResponseTime = values[6]
