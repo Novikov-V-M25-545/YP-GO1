@@ -41,6 +41,9 @@ func parseStats(data string) (*ServerStats, error) {
 	}
 	stats := &ServerStats{}
 	values := make([]float64, 7)
+	// Внутри parseStats, сразу после заполнения values
+	fmt.Println(values)
+
 	for i := 0; i < 7; i++ {
 		val, err := strconv.ParseFloat(strings.TrimSpace(parts[i]), 64)
 		if err != nil {
