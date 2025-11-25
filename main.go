@@ -26,6 +26,10 @@ func fetchStats(url string) (*ServerStats, error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("non-200 status code")
+	}
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
@@ -42,21 +46,38 @@ func parseStats(data string) (*ServerStats, error) {
 		return nil, fmt.Errorf("invalid data format")
 	}
 
-	stats := &ServerStats{}
 	values := make([]float64, 7)
 
 	for i := 0; i < 7; i++ {
-		val, err := strconv.ParseFloat(strings.TrimSpace(parts[i]), 64)
+		v, err := strconv.ParseFloat(strings.TrimSpace(parts[i]), 64)
 		if err != nil {
 			return nil, err
 		}
-		values[i] = val
+		values[i] = v
 	}
 
+	stats := &ServerStats{}
 	stats.LoadAverage = values[0]
-	stats.MemoryUsage = values[4] / 5.1052789766e+09           // Новый делитель для памяти
-	stats.FreeDiskSpace = values[2] / 131178.51                // Новый делитель для диска
-	stats.NetworkBandwidth = values[3] / 4.755036437269566e+09 // Новый делитель для bandwidth
+
+	// values[1] = всего памяти, values[2] = использованной памяти
+	// Memory% = (used / total) * 100
+	if values[1] > 0 {
+		stats.MemoryUsage = (values[2] / values[1]) * 100
+	}
+
+	// values[3] = всего диска, values[4] = использованного диска
+	// Free Disk = (total - used) / 1024 / 1024 (в Mb)
+	freeDiskBytes := values[3] - values[4]
+	stats.FreeDiskSpace = freeDiskBytes / 1024 / 1024
+
+	// values[5] = пропускная способность, values[6] = загруженность
+	// Bandwidth Free% = ((total - used) / total) * 100
+	// Bandwidth Mbit/s = ((total - used) / 1_000_000)
+	if values[5] > 0 {
+		freeBandwidthBytes := values[5] - values[6]
+		stats.NetworkBandwidth = freeBandwidthBytes / 1_000_000 / 8 // Байты/с → Мегабиты/с
+	}
+
 	stats.CPUUsage = values[1]
 	stats.RequestsPerSecond = values[5]
 	stats.ResponseTime = values[6]
