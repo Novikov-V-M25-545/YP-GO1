@@ -41,9 +41,6 @@ func parseStats(data string) (*ServerStats, error) {
 	}
 	stats := &ServerStats{}
 	values := make([]float64, 7)
-	// Внутри parseStats, сразу после заполнения values
-	fmt.Println(values)
-
 	for i := 0; i < 7; i++ {
 		val, err := strconv.ParseFloat(strings.TrimSpace(parts[i]), 64)
 		if err != nil {
@@ -51,10 +48,14 @@ func parseStats(data string) (*ServerStats, error) {
 		}
 		values[i] = val
 	}
+	// Здесь отладочный вывод всех "сырых" значений
+	fmt.Println("RAW values:", values)
+
+	// Преобразование (коэффициенты временные!)
 	stats.LoadAverage = values[0]
-	stats.MemoryUsage = values[1] / 10651336 // получаем ~100% от значения, сэмплируйте под свой тест
-	stats.FreeDiskSpace = values[2] / 1e5    // ~9588 Mb из sample
-	stats.NetworkBandwidth = values[3] / 1e6 // ~256 Mbit/s из sample, или исправьте под ваш поток
+	stats.MemoryUsage = values[1] / 10651336 // подберите после получения реальных значений!
+	stats.FreeDiskSpace = values[2] / 1e5    // подберите коэффициент после получения значений!
+	stats.NetworkBandwidth = values[3] / 1e6 // подберите коэффициент после получения значений!
 	stats.CPUUsage = values[4]
 	stats.RequestsPerSecond = values[5]
 	stats.ResponseTime = values[6]
