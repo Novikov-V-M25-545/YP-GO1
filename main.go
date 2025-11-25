@@ -53,15 +53,11 @@ func parseStats(data string) (*ServerStats, error) {
 		values[i] = val
 	}
 
-	// ПОЛНЫЙ DEBUG ВСЕХ 7 ПАРАМЕТРОВ
-	fmt.Printf("DEBUG: v0=%v, v1=%v, v2=%v, v3=%v, v4=%v, v5=%v, v6=%v\n",
-		values[0], values[1], values[2], values[3], values[4], values[5], values[6])
-
 	stats.LoadAverage = values[0]
-	stats.MemoryUsage = values[1] / 53013164.53
-	stats.FreeDiskSpace = values[2] / 3903737.59
-	stats.NetworkBandwidth = values[3] / 11466025186
-	stats.CPUUsage = values[4]
+	stats.MemoryUsage = values[4] / 3.47298740774e+09           // Память из 4-го параметра!
+	stats.FreeDiskSpace = values[2] / 207399.40                 // Диск из 2-го параметра!
+	stats.NetworkBandwidth = values[3] / 1.2040924369161291e+10 // Bandwidth из 3-го параметра!
+	stats.CPUUsage = values[1]
 	stats.RequestsPerSecond = values[5]
 	stats.ResponseTime = values[6]
 
