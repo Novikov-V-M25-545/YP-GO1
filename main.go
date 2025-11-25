@@ -86,12 +86,11 @@ func parseStats(data string) (*ServerStats, error) {
 		values[i] = v
 	}
 
-	// Вот здесь подберите корректные коэффициенты:
 	stats := &ServerStats{
-		LoadAverage:       values[0],            // 1-е число
-		MemoryUsage:       values[1] / 43216952, // подбирается вручную!
-		FreeDiskSpace:     values[2] / 100000,   // подбирается вручную!
-		NetworkBandwidth:  values[3] / 1e9,      // подбирается вручную!
+		LoadAverage:       values[0],
+		MemoryUsage:       values[1] / 49383288.20, // для процента
+		FreeDiskSpace:     values[2] / 198492.7,    // для Mb
+		NetworkBandwidth:  values[3] / 592037761,   // для Mbit/s
 		CPUUsage:          values[4],
 		RequestsPerSecond: values[5],
 		ResponseTime:      values[6],
