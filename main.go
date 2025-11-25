@@ -53,6 +53,10 @@ func parseStats(data string) (*ServerStats, error) {
 		values[i] = val
 	}
 
+	// ПОЛНЫЙ DEBUG ВСЕХ 7 ПАРАМЕТРОВ
+	fmt.Printf("DEBUG: v0=%v, v1=%v, v2=%v, v3=%v, v4=%v, v5=%v, v6=%v\n",
+		values[0], values[1], values[2], values[3], values[4], values[5], values[6])
+
 	stats.LoadAverage = values[0]
 	stats.MemoryUsage = values[1] / 53013164.53
 	stats.FreeDiskSpace = values[2] / 3903737.59
