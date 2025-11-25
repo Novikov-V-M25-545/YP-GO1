@@ -60,21 +60,17 @@ func parseStats(data string) (*ServerStats, error) {
 	stats := &ServerStats{}
 	stats.LoadAverage = values[0]
 
-	// values[1] = всего памяти, values[2] = использованной памяти
 	if values[1] > 0 {
 		stats.MemoryUsage = (values[2] / values[1]) * 100
 	}
 
-	// values[3] = всего диска, values[4] = использованного диска
 	freeDiskBytes := values[3] - values[4]
 	stats.FreeDiskSpace = freeDiskBytes / 1024 / 1024
 
-	// Процент использования диска
 	if values[3] > 0 {
 		stats.DiskUsagePercent = (values[4] / values[3]) * 100
 	}
 
-	// values[5] = пропускная способность, values[6] = загруженность
 	if values[5] > 0 {
 		bandwidthUsagePercent := (values[6] / values[5]) * 100
 
@@ -100,7 +96,6 @@ func checkThresholds(stats *ServerStats) {
 		fmt.Printf("Memory usage too high: %d%%\n", int(stats.MemoryUsage))
 	}
 
-	// Проверяем если использование диска > 90%
 	if stats.DiskUsagePercent > 90 {
 		fmt.Printf("Free disk space is too low: %d Mb left\n", int(stats.FreeDiskSpace))
 	}
@@ -132,7 +127,4 @@ func main() {
 		errorCount = 0
 		checkThresholds(stats)
 	}
-
-	// Небольшая задержка перед выходом для гарантии обработки последних запросов
-	time.Sleep(100 * time.Millisecond)
 }
