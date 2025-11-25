@@ -48,14 +48,15 @@ func parseStats(data string) (*ServerStats, error) {
 		}
 		values[i] = val
 	}
-	// Здесь отладочный вывод всех "сырых" значений
 	fmt.Println("RAW values:", values)
 
-	// Преобразование (коэффициенты временные!)
 	stats.LoadAverage = values[0]
-	stats.MemoryUsage = values[1] / 10651336 // подберите после получения реальных значений!
-	stats.FreeDiskSpace = values[2] / 1e5    // подберите коэффициент после получения значений!
-	stats.NetworkBandwidth = values[3] / 1e6 // подберите коэффициент после получения значений!
+	// = Memory: 4_321_695_273 / 43_216_952 = 100%
+	stats.MemoryUsage = values[1] / 43216952
+	// = Disk: 2_143_030_727 / 100_000 = 21430 Mb
+	stats.FreeDiskSpace = values[2] / 100000
+	// = Bandwidth: 5.37481624004e+11 / 1_000_000_000 = 537
+	stats.NetworkBandwidth = values[3] / 1e9
 	stats.CPUUsage = values[4]
 	stats.RequestsPerSecond = values[5]
 	stats.ResponseTime = values[6]
