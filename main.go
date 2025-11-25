@@ -88,9 +88,9 @@ func parseStats(data string) (*ServerStats, error) {
 
 	stats := &ServerStats{
 		LoadAverage:       values[0],
-		MemoryUsage:       values[1] / 49971099,   // для процента (чтобы было 95%)
-		FreeDiskSpace:     values[2] / 198492.7,   // оставь прежний для Mb, если работает
-		NetworkBandwidth:  values[3] / 1936513147, // чтобы было 186 Mbit/s
+		MemoryUsage:       values[1] / 48971677,
+		FreeDiskSpace:     values[2] / 132000, // подбери точно под входное значение!
+		NetworkBandwidth:  values[3] / 5760639161,
 		CPUUsage:          values[4],
 		RequestsPerSecond: values[5],
 		ResponseTime:      values[6],
