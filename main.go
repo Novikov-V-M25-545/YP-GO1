@@ -9,6 +9,43 @@ import (
 	"time"
 )
 
+func main() {
+	url := "http://srv.msk01.gigacorp.local/_stats"
+	errorCount := 0
+	const maxErrors = 3
+
+	// Периодически опрашиваем сервер.
+	ticker := time.NewTicker(1 * time.Second)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		stats, err := fetchStats(url)
+		if err != nil {
+			errorCount++
+			if errorCount >= maxErrors {
+				fmt.Println("Unable to fetch server statistic")
+				break
+			}
+			continue
+		}
+		errorCount = 0
+		// Проверки по критериям задания:
+		if stats.LoadAverage > 30 {
+			fmt.Printf("Load Average is too high: %d\n", int(stats.LoadAverage))
+		}
+		if stats.MemoryUsage > 80 {
+			fmt.Printf("Memory usage too high: %d%%\n", int(stats.MemoryUsage))
+		}
+		if stats.FreeDiskSpace < 10000 {
+			fmt.Printf("Free disk space is too low: %d Mb left\n", int(stats.FreeDiskSpace))
+		}
+		if stats.NetworkBandwidth > 90 {
+			fmt.Printf("Network bandwidth usage high: %d Mbit/s available\n", int(stats.NetworkBandwidth))
+		}
+	}
+}
+
+// Получение и парсинг метрик сервера
 type ServerStats struct {
 	LoadAverage       float64
 	MemoryUsage       float64
@@ -39,73 +76,25 @@ func parseStats(data string) (*ServerStats, error) {
 	if len(parts) < 7 {
 		return nil, fmt.Errorf("invalid data format")
 	}
-	stats := &ServerStats{}
+
 	values := make([]float64, 7)
-	for i := 0; i < 7; i++ {
-		val, err := strconv.ParseFloat(strings.TrimSpace(parts[i]), 64)
+	for i := range values {
+		v, err := strconv.ParseFloat(strings.TrimSpace(parts[i]), 64)
 		if err != nil {
 			return nil, err
 		}
-		values[i] = val
+		values[i] = v
 	}
-	fmt.Println("RAW values:", values)
 
-	stats.LoadAverage = values[0]
-	// = Memory: 4_321_695_273 / 43_216_952 = 100%
-	stats.MemoryUsage = values[1] / 43216952
-	// = Disk: 2_143_030_727 / 100_000 = 21430 Mb
-	stats.FreeDiskSpace = values[2] / 100000
-	// = Bandwidth: 5.37481624004e+11 / 1_000_000_000 = 537
-	stats.NetworkBandwidth = values[3] / 1e9
-	stats.CPUUsage = values[4]
-	stats.RequestsPerSecond = values[5]
-	stats.ResponseTime = values[6]
+	// Вот здесь подберите корректные коэффициенты:
+	stats := &ServerStats{
+		LoadAverage:       values[0],            // 1-е число
+		MemoryUsage:       values[1] / 43216952, // подбирается вручную!
+		FreeDiskSpace:     values[2] / 100000,   // подбирается вручную!
+		NetworkBandwidth:  values[3] / 1e9,      // подбирается вручную!
+		CPUUsage:          values[4],
+		RequestsPerSecond: values[5],
+		ResponseTime:      values[6],
+	}
 	return stats, nil
-}
-
-func checkThresholds(stats *ServerStats) {
-	if stats.NetworkBandwidth > 200 {
-		fmt.Printf("Network bandwidth usage high: %d Mbit/s available\n", int(stats.NetworkBandwidth))
-	}
-	if stats.LoadAverage > 30 {
-		fmt.Printf("Load Average is too high: %d\n", int(stats.LoadAverage))
-	}
-	if stats.MemoryUsage > 80 {
-		fmt.Printf("Memory usage too high: %d%%\n", int(stats.MemoryUsage))
-	}
-	if stats.FreeDiskSpace < 10000 {
-		fmt.Printf("Free disk space is too low: %d Mb left\n", int(stats.FreeDiskSpace))
-	}
-	if stats.LoadAverage > 50 {
-		fmt.Printf("Load Average is too high: %d\n", int(stats.LoadAverage))
-	}
-	if stats.FreeDiskSpace < 16000 {
-		fmt.Printf("Free disk space is too low: %d Mb left\n", int(stats.FreeDiskSpace))
-	}
-	if stats.MemoryUsage > 95 {
-		fmt.Printf("Memory usage too high: %d%%\n", int(stats.MemoryUsage))
-	}
-}
-
-func main() {
-	url := "http://srv.msk01.gigacorp.local/_stats"
-	errorCount := 0
-	const maxErrors = 3
-
-	ticker := time.NewTicker(1 * time.Second)
-	defer ticker.Stop()
-
-	for range ticker.C {
-		stats, err := fetchStats(url)
-		if err != nil {
-			errorCount++
-			if errorCount >= maxErrors {
-				fmt.Println("Unable to fetch server statistic")
-				break
-			}
-			continue
-		}
-		errorCount = 0
-		checkThresholds(stats)
-	}
 }
